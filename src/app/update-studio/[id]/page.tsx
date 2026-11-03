@@ -1,10 +1,10 @@
-
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Pencil } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
+
 
 interface Studio {
   _id: string;
@@ -16,8 +16,8 @@ interface Studio {
   image: string;
 }
 
-export default function UpdateStudioPage() {
-  const router = useRouter();
+function UpdateStudioContent() {
+      const router = useRouter();
   const params = useParams();
   const studioId = params.id as string;
 
@@ -288,5 +288,20 @@ export default function UpdateStudioPage() {
         </form>
       </div>
     </main>
+  );
+}
+export default function UpdateStudioPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-950">
+          <p className="text-lg font-semibold text-violet-600">
+            Loading studio...
+          </p>
+        </main>
+      }
+    >
+      <UpdateStudioContent />
+    </Suspense>
   );
 }

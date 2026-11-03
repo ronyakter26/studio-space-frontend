@@ -3,8 +3,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
+import { authClient } from "@/lib/auth-client";
 
 import {
   MapPin,
@@ -27,7 +28,10 @@ type Studio = {
 
 function StudioDetailsContent() {
   const params = useParams();
+  const router = useRouter();
   const id = params.id as string;
+
+  const { data: session, isPending } = authClient.useSession();
 
   const [studio, setStudio] = useState<Studio | null>(null);
   const [loading, setLoading] = useState(true);
@@ -68,7 +72,27 @@ function StudioDetailsContent() {
     }
   }, [id]);
 
-  if (loading) {
+  const handleBooking = async () => {
+  try {
+    const { data: sessionData } = await authClient.getSession();
+
+    if (!sessionData?.user) {
+      router.push(
+        `/login?callbackURL=${encodeURIComponent(`/studios/${id}`)}`
+      );
+      return;
+    }
+
+    router.push(`/book-studio/${id}`);
+  } catch (error) {
+    console.error("Session check failed:", error);
+    router.push(
+      `/login?callbackURL=${encodeURIComponent(`/studios/${id}`)}`
+    );
+  }
+};
+
+  if (loading || isPending) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
         <p className="text-violet-600 font-semibold">
@@ -201,12 +225,12 @@ function StudioDetailsContent() {
 
             </div>
 
-            <Link
-              href="/login"
+            <button
+              onClick={handleBooking}
               className="inline-flex items-center justify-center mt-10 w-full md:w-auto px-10 py-4 rounded-xl bg-violet-600 text-white font-semibold hover:bg-violet-700 transition"
             >
               Book This Studio
-            </Link>
+            </button>
 
           </div>
         </div>
@@ -214,6 +238,7 @@ function StudioDetailsContent() {
     </main>
   );
 }
+
 export default function StudioDetailsPage() {
   return (
     <Suspense fallback={<div>Loading studio details...</div>}>
