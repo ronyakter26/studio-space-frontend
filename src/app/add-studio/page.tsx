@@ -4,6 +4,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { PlusCircle } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
 
 export default function AddStudioPage() {
   const router = useRouter();
@@ -37,12 +38,21 @@ export default function AddStudioPage() {
     setMessage("");
 
     try {
+      // Get JWT Token from Better Auth
+      const { data: tokenData, error: tokenError } =
+        await authClient.token();
+
+      if (tokenError || !tokenData?.token) {
+        throw new Error("Unable to get authentication token. Please login again.");
+      }
+
       const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
       const response = await fetch(`${apiUrl}/api/studios`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenData.token}`,
         },
         body: JSON.stringify(formData),
       });
@@ -81,7 +91,6 @@ export default function AddStudioPage() {
   return (
     <main className="min-h-screen bg-gray-50 px-5 py-16 dark:bg-gray-950">
       <div className="mx-auto max-w-3xl">
-
         <div className="mb-10 text-center">
           <div className="mb-4 flex justify-center">
             <PlusCircle size={42} className="text-violet-600" />
