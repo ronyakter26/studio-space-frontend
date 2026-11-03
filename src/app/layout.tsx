@@ -6,6 +6,7 @@ import "./globals.css";
 
 import Providers from "@/components/Providers";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 const josefinSans = Josefin_Sans({
   subsets: ["latin"],
@@ -32,6 +33,8 @@ export default function RootLayout({
           </Suspense>
 
           {children}
+                  <Footer />
+
         </Providers>
       </body>
     </html>

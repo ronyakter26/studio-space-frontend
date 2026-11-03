@@ -24,8 +24,10 @@ const features = [
 
 export default function HostGuarantee() {
   return (
-    <section className="py-20 px-5 bg-gray-50 dark:bg-gray-950">
-      <div className="max-w-7xl mx-auto">
+<section
+  id="about"
+  className="py-20 px-5 bg-gray-50 dark:bg-gray-950"
+>      <div className="max-w-7xl mx-auto">
         <div className="text-center mb-14">
           <p className="text-violet-600 font-semibold mb-2">
             YOUR TRUST MATTERS

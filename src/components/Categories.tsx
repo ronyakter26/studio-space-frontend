@@ -52,9 +52,9 @@ export default function Categories() {
     <section className="bg-gray-50 dark:bg-gray-950 py-20 px-5">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
-          <p className="text-violet-600 font-semibold mb-2">
-            EXPLORE CATEGORIES
-          </p>
+<p className="text-violet-600 dark:text-violet-400 font-semibold mb-2">
+  EXPLORE CATEGORIES
+</p>            
 
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
             Find the Perfect Studio
@@ -74,7 +74,7 @@ export default function Categories() {
                 key={category.name}
                 className="group bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-7 hover:border-violet-500 hover:shadow-xl transition-all duration-300"
               >
-                <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-violet-100 dark:bg-violet-950 text-violet-600 mb-5 group-hover:bg-violet-600 group-hover:text-white transition-all">
+                <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-violet-100 dark:bg-violet-950 text-violet-600 dark:text-violet-400 mb-5 group-hover:bg-violet-600 group-hover:text-white transition-all">
                   <Icon size={28} />
                 </div>
 
@@ -86,8 +86,8 @@ export default function Categories() {
                   {category.description}
                 </p>
 
-                <span className="text-violet-600 text-sm font-semibold">
-                  {category.count}
+<span className="text-violet-600 dark:text-violet-400 text-sm font-semibold"> 
+                      {category.count}
                 </span>
               </div>
             );

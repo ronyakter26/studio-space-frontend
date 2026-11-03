@@ -2,3 +2,36 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Global Dark Mode */
+.dark body {
+  background-color: #030712;
+  color: #f3f4f6;
+}
+
+/* White and light backgrounds */
+.dark [class~="bg-white"],
+.dark [class~="bg-gray-50"],
+.dark [class~="bg-gray-100"] {
+  background-color: #111827 !important;
+}
+
+/* Text colors */
+.dark [class~="text-gray-900"],
+.dark [class~="text-gray-800"],
+.dark [class~="text-gray-700"] {
+  color: #f3f4f6 !important;
+}
+
+.dark [class~="text-gray-600"],
+.dark [class~="text-gray-500"] {
+  color: #9ca3af !important;
+}
+
+/* Borders */
+.dark [class~="border-gray-100"],
+.dark [class~="border-gray-200"],
+.dark [class~="border-gray-300"] {
+  border-color: #374151 !important;
+}

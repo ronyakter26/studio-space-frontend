@@ -14,9 +14,9 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Get the previous page URL
   const getRedirectPath = () => {
     const params = new URLSearchParams(window.location.search);
     const callbackURL = params.get("callbackURL");
@@ -32,7 +32,6 @@ export default function LoginPage() {
     return "/";
   };
 
-  // If already logged in, redirect automatically
   useEffect(() => {
     if (!isPending && session?.user) {
       router.replace(getRedirectPath());
@@ -66,6 +65,26 @@ export default function LoginPage() {
     }
   };
 
+  const handleGoogleLogin = async () => {
+    setGoogleLoading(true);
+    setError("");
+
+    try {
+      const { error } = await authClient.signIn.social({
+        provider: "google",
+        callbackURL: getRedirectPath(),
+      });
+
+      if (error) {
+        setError(error.message || "Google login failed.");
+        setGoogleLoading(false);
+      }
+    } catch {
+      setError("Google login failed. Please try again.");
+      setGoogleLoading(false);
+    }
+  };
+
   if (isPending || session?.user) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-950">
@@ -90,6 +109,22 @@ export default function LoginPage() {
           </p>
         </div>
 
+        <button
+          type="button"
+          onClick={handleGoogleLogin}
+          disabled={googleLoading || loading}
+          className="flex w-full items-center justify-center gap-3 rounded-full border border-gray-300 py-3 font-semibold text-gray-700 transition hover:bg-gray-50 disabled:opacity-60 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800"
+        >
+          <span className="text-xl font-bold text-blue-600">G</span>
+          {googleLoading ? "Connecting..." : "Continue with Google"}
+        </button>
+
+        <div className="my-6 flex items-center gap-3">
+          <div className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
+          <span className="text-sm text-gray-500">OR</span>
+          <div className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
+        </div>
+
         <form onSubmit={handleLogin} className="space-y-5">
 
           <div>
@@ -103,7 +138,7 @@ export default function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               placeholder="Enter your email"
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-violet-600 dark:border-gray-700 dark:bg-gray-800"
+              className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-violet-600 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
             />
           </div>
 
@@ -118,7 +153,7 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               placeholder="Enter your password"
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-violet-600 dark:border-gray-700 dark:bg-gray-800"
+              className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-violet-600 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
             />
           </div>
 
@@ -130,7 +165,7 @@ export default function LoginPage() {
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || googleLoading}
             className="w-full rounded-full bg-violet-600 py-3 font-semibold text-white transition hover:bg-violet-700 disabled:opacity-60"
           >
             {loading ? "Signing In..." : "Sign In"}

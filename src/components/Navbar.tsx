@@ -23,7 +23,7 @@ import { authClient } from "@/lib/auth-client";
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
 
   const { data: session, isPending } = authClient.useSession();
 
@@ -35,6 +35,10 @@ export default function Navbar() {
     setMounted(true);
   }, []);
 
+  const toggleTheme = () => {
+    setTheme(resolvedTheme === "dark" ? "light" : "dark");
+  };
+
   const navLinks = [
     { name: "Home", href: "/" },
     { name: "Explore Studios", href: "/explore" },
@@ -43,10 +47,35 @@ export default function Navbar() {
   ];
 
   const accountLinks = [
+    { name: "My Profile", href: "/profile", icon: UserCircle },
     { name: "Add Studio", href: "/add-studio", icon: PlusCircle },
     { name: "My Listings", href: "/my-listings", icon: List },
     { name: "My Bookings", href: "/my-bookings", icon: CalendarDays },
   ];
+
+  const handleNavClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    href: string
+  ) => {
+    if (!href.includes("#")) return;
+
+    e.preventDefault();
+
+    const id = href.split("#")[1];
+
+    if (pathname !== "/") {
+      router.push(href);
+      setMobileMenu(false);
+      return;
+    }
+
+    document.getElementById(id)?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+
+    setMobileMenu(false);
+  };
 
   const handleLogout = async () => {
     try {
@@ -84,6 +113,7 @@ export default function Navbar() {
             <Link
               key={link.name}
               href={link.href}
+              onClick={(e) => handleNavClick(e, link.href)}
               className={`text-sm font-semibold transition-colors hover:text-violet-600 ${
                 pathname === link.href
                   ? "text-violet-600"
@@ -100,13 +130,11 @@ export default function Navbar() {
 
           {/* Theme Toggle */}
           <button
-            onClick={() =>
-              setTheme(theme === "dark" ? "light" : "dark")
-            }
+            onClick={toggleTheme}
             className="rounded-full border border-gray-200 p-2.5 text-gray-700 transition hover:bg-gray-100 dark:border-gray-700 dark:text-yellow-400 dark:hover:bg-gray-800"
             aria-label="Toggle theme"
           >
-            {mounted && theme === "dark" ? (
+            {mounted && resolvedTheme === "dark" ? (
               <Sun size={19} />
             ) : (
               <Moon size={19} />
@@ -118,13 +146,22 @@ export default function Navbar() {
             session?.user ? (
               <div className="relative">
 
-                {/* Profile Dropdown Button */}
                 <button
                   onClick={() => setProfileDropdown(!profileDropdown)}
                   className="flex items-center gap-2 rounded-full border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:border-violet-500 hover:text-violet-600 dark:border-gray-700 dark:text-gray-200"
                 >
-                  <UserCircle size={19} />
+                  {session.user.image ? (
+                    <img
+                      src={session.user.image}
+                      alt="Profile"
+                      className="h-7 w-7 rounded-full object-cover"
+                    />
+                  ) : (
+                    <UserCircle size={20} />
+                  )}
+
                   <span>My Account</span>
+
                   <ChevronDown
                     size={17}
                     className={`transition-transform ${
@@ -135,7 +172,7 @@ export default function Navbar() {
 
                 {/* Dropdown Menu */}
                 {profileDropdown && (
-                  <div className="absolute right-0 top-full mt-3 w-56 overflow-hidden rounded-xl border border-gray-200 bg-white py-2 shadow-xl dark:border-gray-700 dark:bg-gray-900">
+                  <div className="absolute right-0 top-full mt-3 w-60 overflow-hidden rounded-xl border border-gray-200 bg-white py-2 shadow-xl dark:border-gray-700 dark:bg-gray-900">
 
                     <div className="border-b border-gray-100 px-4 py-3 dark:border-gray-800">
                       <p className="text-sm font-semibold text-gray-900 dark:text-white">
@@ -188,7 +225,7 @@ export default function Navbar() {
                 </Link>
 
                 <Link
-                  href="/register"
+                  href="/sign-up"
                   className="rounded-full bg-violet-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-violet-700"
                 >
                   Register
@@ -201,13 +238,11 @@ export default function Navbar() {
         {/* Mobile Right Side */}
         <div className="flex items-center gap-2 md:hidden">
           <button
-            onClick={() =>
-              setTheme(theme === "dark" ? "light" : "dark")
-            }
+            onClick={toggleTheme}
             className="rounded-full border border-gray-200 p-2 dark:border-gray-700"
             aria-label="Toggle theme"
           >
-            {mounted && theme === "dark" ? (
+            {mounted && resolvedTheme === "dark" ? (
               <Sun size={19} className="text-yellow-400" />
             ) : (
               <Moon size={19} />
@@ -233,7 +268,7 @@ export default function Navbar() {
               <Link
                 key={link.name}
                 href={link.href}
-                onClick={() => setMobileMenu(false)}
+                onClick={(e) => handleNavClick(e, link.href)}
                 className={`font-semibold ${
                   pathname === link.href
                     ? "text-violet-600"
@@ -249,13 +284,28 @@ export default function Navbar() {
 
                 {session?.user ? (
                   <>
-                    <div className="mb-4">
-                      <p className="font-semibold text-gray-900 dark:text-white">
-                        {session.user.name || "My Account"}
-                      </p>
-                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                        {session.user.email}
-                      </p>
+                    <div className="mb-4 flex items-center gap-3">
+                      {session.user.image ? (
+                        <img
+                          src={session.user.image}
+                          alt="Profile"
+                          className="h-11 w-11 rounded-full object-cover"
+                        />
+                      ) : (
+                        <UserCircle
+                          size={38}
+                          className="text-violet-600"
+                        />
+                      )}
+
+                      <div>
+                        <p className="font-semibold text-gray-900 dark:text-white">
+                          {session.user.name || "My Account"}
+                        </p>
+                        <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                          {session.user.email}
+                        </p>
+                      </div>
                     </div>
 
                     <div className="flex flex-col gap-4">
@@ -295,7 +345,7 @@ export default function Navbar() {
                     </Link>
 
                     <Link
-                      href="/register"
+                      href="/sign-up"
                       onClick={() => setMobileMenu(false)}
                       className="flex-1 rounded-full bg-violet-600 py-2.5 text-center font-semibold text-white"
                     >
