@@ -10,6 +10,11 @@ const db = client.db("studioSpace");
 export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL,
 
+  trustedOrigins: [
+    "http://localhost:3000",
+    "https://studio-space-frontend-delta.vercel.app",
+  ],
+
   database: mongodbAdapter(db, {
     client,
   }),
