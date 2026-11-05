@@ -9,7 +9,6 @@ import { toast } from "sonner";
 
 export default function LoginPage() {
   const router = useRouter();
-
   const { data: session, isPending } = authClient.useSession();
 
   const [email, setEmail] = useState("");
@@ -38,9 +37,7 @@ export default function LoginPage() {
     }
   }, [isPending, session, router]);
 
-  const handleLogin = async (
-    e: React.FormEvent<HTMLFormElement>
-  ) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
 
@@ -108,25 +105,7 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* Google Login */}
-        <button
-          type="button"
-          onClick={handleGoogleLogin}
-          disabled={googleLoading || loading}
-          className="flex w-full items-center justify-center gap-3 rounded-full border border-gray-300 py-3 font-semibold text-gray-700 transition hover:bg-gray-50 disabled:opacity-60 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800"
-        >
-          <span className="text-xl font-bold text-blue-600">G</span>
-          {googleLoading ? "Connecting..." : "Continue with Google"}
-        </button>
-
-        <div className="my-6 flex items-center gap-3">
-          <div className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
-          <span className="text-sm text-gray-500">OR</span>
-          <div className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
-        </div>
-
         <form onSubmit={handleLogin} className="space-y-5">
-
           <div>
             <label className="mb-2 block font-semibold text-gray-700 dark:text-gray-200">
               Email
@@ -164,8 +143,24 @@ export default function LoginPage() {
           >
             {loading ? "Signing In..." : "Sign In"}
           </button>
-
         </form>
+
+        <div className="my-6 flex items-center gap-3">
+          <div className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
+          <span className="text-sm text-gray-500">OR</span>
+          <div className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
+        </div>
+
+        {/* Google Login - Below Email Login */}
+        <button
+          type="button"
+          onClick={handleGoogleLogin}
+          disabled={googleLoading || loading}
+          className="flex w-full items-center justify-center gap-3 rounded-full border border-gray-300 py-3 font-semibold text-gray-700 transition hover:bg-gray-50 disabled:opacity-60 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800"
+        >
+          <span className="text-xl font-bold text-blue-600">G</span>
+          {googleLoading ? "Connecting..." : "Continue with Google"}
+        </button>
 
         <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
           Don't have an account?{" "}
@@ -176,7 +171,6 @@ export default function LoginPage() {
             Sign Up
           </Link>
         </p>
-
       </div>
     </main>
   );

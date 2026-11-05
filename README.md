@@ -1,36 +1,182 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# StudioSpace – Creative Studio Rental Marketplace
 
-## Getting Started
+StudioSpace is a peer-to-peer creative studio rental marketplace where users can discover, list, and book creative spaces such as photography studios, podcast rooms, music studios, and workshops.
 
-First, run the development server:
+## Live Website
+
+- **Frontend:** [Add your deployed Vercel URL]
+- **Backend API:** [Add your deployed backend URL]
+- **Frontend GitHub:** https://github.com/ronyakter26/studio-space-frontend
+- **Backend GitHub:** https://github.com/ronyakter26/studio-space-backend
+
+## Key Features
+
+- Browse available creative studios.
+- Search studios and filter by category.
+- View detailed information about each studio.
+- User authentication with email and password.
+- Google authentication.
+- Add new studios and manage personal listings.
+- Update and delete studio listings.
+- Book studios by selecting a date and time.
+- View personal bookings.
+- Cancel pending bookings.
+- Toast notifications for user actions.
+- Responsive design for desktop and mobile devices.
+- Dark and light theme support.
+- Loading indicators and empty states.
+- Protected routes for authenticated users.
+
+## Technologies Used
+
+### Frontend
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+- shadcn/ui
+- Lucide React
+- Sonner
+- Better Auth
+
+### Backend
+- Node.js
+- Express.js
+- MongoDB
+- MongoDB Native Driver
+- JOSE (JWT verification)
+- CORS
+- dotenv
+
+### Authentication & Security
+- Better Auth
+- Google OAuth
+- JWT authentication for protected API endpoints
+- Protected frontend routes
+- Server-side authorization checks
+
+## Project Structure
+
+```text
+studio-space/
+├── public/
+├── src/
+│   ├── app/
+│   │   ├── api/
+│   │   ├── login/
+│   │   ├── register/
+│   │   ├── studios/
+│   │   ├── add-studio/
+│   │   ├── my-listings/
+│   │   ├── my-bookings/
+│   │   └── ...
+│   ├── components/
+│   └── lib/
+├── .env.local
+├── package.json
+└── README.md
+```
+
+## Installation & Setup
+
+### 1. Clone the frontend repository
+
+```bash
+git clone https://github.com/ronyakter26/studio-space-frontend.git
+```
+
+### 2. Go to the frontend folder
+
+```bash
+cd studio-space-frontend
+```
+
+### 3. Install dependencies
+
+```bash
+npm install
+```
+
+### 4. Configure environment variables
+
+Create a `.env.local` file in the frontend root directory.
+
+```env
+BETTER_AUTH_URL=http://localhost:3000
+NEXT_PUBLIC_API_URL=http://localhost:5000
+MONGO_URI=your_mongodb_connection_string
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+```
+
+Use the same MongoDB database and authentication configuration required by the backend.
+
+### 5. Run the frontend
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Frontend will run at:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```text
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Backend Setup
 
-## Learn More
+### 1. Clone the backend repository
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+git clone https://github.com/ronyakter26/studio-space-backend.git
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 2. Go to the backend folder
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+cd studio-space-backend
+```
 
-## Deploy on Vercel
+### 3. Install dependencies
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npm install
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 4. Configure environment variables
+
+Create a `.env` file in the backend root directory.
+
+```env
+PORT=5000
+MONGO_URI=your_mongodb_connection_string
+BETTER_AUTH_URL=http://localhost:3000
+```
+
+### 5. Run the backend
+
+```bash
+npm start
+```
+
+Backend API will run at:
+
+```text
+http://localhost:5000
+```
+
+Start both frontend and backend servers to use the application locally.
+
+## Test Credentials
+
+- **Email:** [ronyakter418@gmail.com]
+- **Password:** [assigment8]
+
+## Author
+
+**Rony Akter**
+
+Frontend Developer
+
+GitHub: https://github.com/ronyakter26
+

@@ -76,28 +76,8 @@ export default function RegisterPage() {
           </p>
         </div>
 
-        {/* Google Sign Up */}
-        <button
-          type="button"
-          onClick={handleGoogleSignUp}
-          disabled={loading || googleLoading}
-          className="flex w-full items-center justify-center gap-3 rounded-full border border-gray-300 py-3 font-semibold text-gray-700 transition hover:bg-gray-100 disabled:opacity-60 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800"
-        >
-          <span className="text-xl font-bold text-blue-600">G</span>
-          {googleLoading
-            ? "Connecting to Google..."
-            : "Continue with Google"}
-        </button>
-
-        <div className="my-6 flex items-center gap-3">
-          <div className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
-          <span className="text-sm text-gray-500">OR</span>
-          <div className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
-        </div>
-
         {/* Email Registration */}
         <form onSubmit={handleRegister} className="space-y-5">
-
           <div>
             <label className="mb-2 block font-semibold text-gray-700 dark:text-gray-200">
               Full Name
@@ -152,6 +132,25 @@ export default function RegisterPage() {
             {loading ? "Creating Account..." : "Sign Up"}
           </button>
         </form>
+
+        <div className="my-6 flex items-center gap-3">
+          <div className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
+          <span className="text-sm text-gray-500">OR</span>
+          <div className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
+        </div>
+
+        {/* Google Sign Up - Below Registration */}
+        <button
+          type="button"
+          onClick={handleGoogleSignUp}
+          disabled={loading || googleLoading}
+          className="flex w-full items-center justify-center gap-3 rounded-full border border-gray-300 py-3 font-semibold text-gray-700 transition hover:bg-gray-100 disabled:opacity-60 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800"
+        >
+          <span className="text-xl font-bold text-blue-600">G</span>
+          {googleLoading
+            ? "Connecting to Google..."
+            : "Continue with Google"}
+        </button>
 
         <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
           Already have an account?{" "}

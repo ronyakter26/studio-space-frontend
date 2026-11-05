@@ -17,12 +17,14 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
+
   account: {
-  accountLinking: {
-    enabled: true,
-    trustedProviders: ["google"],
+    accountLinking: {
+      enabled: true,
+      trustedProviders: ["google"],
+      disableImplicitLinking: false,
+    },
   },
-},
 
   socialProviders: {
     google: {
