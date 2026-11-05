@@ -5,6 +5,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
+import { toast } from "sonner";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -14,14 +15,12 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
-  const [error, setError] = useState("");
 
   const handleRegister = async (
     e: React.FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
 
     try {
       const { error } = await authClient.signUp.email({
@@ -31,13 +30,14 @@ export default function RegisterPage() {
       });
 
       if (error) {
-        setError(error.message || "Registration failed.");
+        toast.error(error.message || "Registration failed.");
         return;
       }
 
+      toast.success("Registration successful!");
       router.push("/login");
     } catch {
-      setError("Something went wrong. Please try again.");
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -45,7 +45,6 @@ export default function RegisterPage() {
 
   const handleGoogleSignUp = async () => {
     setGoogleLoading(true);
-    setError("");
 
     try {
       const { error } = await authClient.signIn.social({
@@ -54,11 +53,11 @@ export default function RegisterPage() {
       });
 
       if (error) {
-        setError(error.message || "Google sign up failed.");
+        toast.error(error.message || "Google sign up failed.");
         setGoogleLoading(false);
       }
     } catch {
-      setError("Google sign up failed. Please try again.");
+      toast.error("Google sign up failed. Please try again.");
       setGoogleLoading(false);
     }
   };
@@ -144,12 +143,6 @@ export default function RegisterPage() {
               className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-violet-600 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
             />
           </div>
-
-          {error && (
-            <p className="rounded-lg bg-red-50 p-3 text-sm text-red-600 dark:bg-red-950 dark:text-red-300">
-              {error}
-            </p>
-          )}
 
           <button
             type="submit"

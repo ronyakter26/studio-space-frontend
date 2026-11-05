@@ -4,6 +4,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { toast } from "sonner";
 import {
   PlusCircle,
   MapPin,
@@ -109,14 +110,14 @@ export default function MyListingsPage() {
         previous.filter((studio) => studio._id !== selectedStudio._id)
       );
 
-      setSuccessMessage("Studio deleted successfully!");
+toast.success("Studio deleted successfully!");
       setSelectedStudio(null);
     } catch (error) {
-      setMessage(
-        error instanceof Error
-          ? error.message
-          : "Something went wrong!"
-      );
+      toast.error(
+  error instanceof Error
+    ? error.message
+    : "Something went wrong!"
+);
     } finally {
       setDeleting(false);
     }

@@ -6,6 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { authClient } from "@/lib/auth-client";
+import { toast } from "sonner";
 
 type Studio = {
   _id: string;
@@ -15,6 +16,22 @@ type Studio = {
   image?: string;
   imageUrl?: string;
 };
+
+function getLocalDate() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
+function getTimeInMinutes(time: string) {
+  if (!time) return 0;
+
+  const [hours, minutes] = time.split(":").map(Number);
+  return hours * 60 + minutes;
+}
 
 function BookingContent() {
   const params = useParams();
@@ -31,22 +48,29 @@ function BookingContent() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  const apiUrl =
+    process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
   useEffect(() => {
     if (isPending) return;
 
     if (!session?.user) {
-      router.replace(`/login?callbackURL=${encodeURIComponent(`/book-studio/${id}`)}`);
+      router.replace(
+        `/login?callbackURL=${encodeURIComponent(`/book-studio/${id}`)}`
+      );
       return;
     }
 
     const fetchStudio = async () => {
       try {
         const response = await fetch(`${apiUrl}/api/studios`);
-        if (!response.ok) throw new Error("Failed to load studio");
+
+        if (!response.ok) {
+          throw new Error("Failed to load studio.");
+        }
 
         const data = await response.json();
+
         const selectedStudio = data.find(
           (item: Studio) => item._id === id
         );
@@ -66,27 +90,41 @@ function BookingContent() {
     fetchStudio();
   }, [id, session, isPending, router, apiUrl]);
 
-  const hours =
-    startTime && endTime
-      ? (new Date(`2000-01-01T${endTime}`).getTime() -
-          new Date(`2000-01-01T${startTime}`).getTime()) /
-        (1000 * 60 * 60)
+  // Calculate duration using minutes
+  const startMinutes = getTimeInMinutes(startTime);
+  const endMinutes = getTimeInMinutes(endTime);
+
+  const durationMinutes =
+    startTime && endTime && endMinutes > startMinutes
+      ? endMinutes - startMinutes
       : 0;
 
-  const totalPrice =
-    studio && hours > 0 ? studio.price * hours : 0;
+  const hours = durationMinutes / 60;
 
-  const handleBooking = async (e: React.FormEvent<HTMLFormElement>) => {
+  const totalPrice =
+    studio && durationMinutes > 0
+      ? Math.round(studio.price * hours)
+      : 0;
+
+  const handleBooking = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
     e.preventDefault();
     setError("");
 
     if (!studio || !bookingDate || !startTime || !endTime) {
-      setError("Please complete all booking fields.");
+      toast.error("Please complete all booking fields.");
       return;
     }
 
-    if (hours <= 0) {
-      setError("End time must be later than start time.");
+    // Prevent past dates using Bangladesh/local date
+    if (bookingDate < getLocalDate()) {
+      toast.error("Please select today or a future date.");
+      return;
+    }
+
+    if (durationMinutes <= 0) {
+      toast.error("End time must be later than start time.");
       return;
     }
 
@@ -96,6 +134,7 @@ function BookingContent() {
       const { data: tokenData } = await authClient.token();
 
       if (!tokenData?.token) {
+        toast.error("Please login to continue.");
         router.push("/login");
         return;
       }
@@ -121,11 +160,17 @@ function BookingContent() {
         throw new Error(data.message || "Booking failed.");
       }
 
-      router.push("/my-bookings");
+      toast.success("Booking successful!");
+
+      setTimeout(() => {
+        router.push("/my-bookings");
+      }, 1000);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Something went wrong."
-      );
+      const message =
+        err instanceof Error ? err.message : "Something went wrong.";
+
+      setError(message);
+      toast.error(message);
     } finally {
       setSubmitting(false);
     }
@@ -142,8 +187,11 @@ function BookingContent() {
   if (!studio) {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center gap-4">
-        <p className="text-red-500">{error || "Studio not found."}</p>
-        <Link href="/explore" className="text-violet-600 underline">
+        <p className="text-red-500">
+          {error || "Studio not found."}
+        </p>
+
+        <Link href="/studios" className="text-violet-600 underline">
           Explore Studios
         </Link>
       </main>
@@ -164,12 +212,14 @@ function BookingContent() {
           <h1 className="mt-4 text-3xl font-bold text-gray-900 dark:text-white">
             Book Your Studio
           </h1>
+
           <p className="mt-2 text-gray-600 dark:text-gray-400">
             Choose your preferred date and time.
           </p>
         </div>
 
         <div className="grid gap-8 md:grid-cols-2">
+          {/* Studio Information */}
           <div className="overflow-hidden rounded-2xl bg-white shadow-sm dark:bg-gray-900">
             <div className="relative h-64 w-full bg-gray-200 dark:bg-gray-800">
               {studio.image || studio.imageUrl ? (
@@ -186,18 +236,21 @@ function BookingContent() {
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                 {studio.name}
               </h2>
+
               <p className="mt-2 text-gray-600 dark:text-gray-400">
                 {studio.location}
               </p>
+
               <p className="mt-4 text-2xl font-bold text-violet-600">
-                ৳{studio.price}
+                ৳{studio.price.toLocaleString()}
                 <span className="text-sm font-normal text-gray-500">
-                  {" "} / hour
+                  {" "}/ hour
                 </span>
               </p>
             </div>
           </div>
 
+          {/* Booking Form */}
           <form
             onSubmit={handleBooking}
             className="space-y-5 rounded-2xl bg-white p-6 shadow-sm dark:bg-gray-900"
@@ -206,13 +259,15 @@ function BookingContent() {
               Booking Information
             </h2>
 
+            {/* Booking Date */}
             <div>
               <label className="mb-2 block text-sm font-medium">
                 Booking Date
               </label>
+
               <input
                 type="date"
-                min={new Date().toISOString().split("T")[0]}
+                min={getLocalDate()}
                 value={bookingDate}
                 onChange={(e) => setBookingDate(e.target.value)}
                 required
@@ -220,10 +275,12 @@ function BookingContent() {
               />
             </div>
 
+            {/* Start Time */}
             <div>
               <label className="mb-2 block text-sm font-medium">
                 Start Time
               </label>
+
               <input
                 type="time"
                 value={startTime}
@@ -233,12 +290,15 @@ function BookingContent() {
               />
             </div>
 
+            {/* End Time */}
             <div>
               <label className="mb-2 block text-sm font-medium">
                 End Time
               </label>
+
               <input
                 type="time"
+                min={startTime || undefined}
                 value={endTime}
                 onChange={(e) => setEndTime(e.target.value)}
                 required
@@ -246,13 +306,20 @@ function BookingContent() {
               />
             </div>
 
+            {/* Price Calculation */}
             <div className="rounded-xl bg-violet-50 p-4 dark:bg-violet-950/30">
               <div className="flex justify-between text-sm">
                 <span>Duration</span>
-                <span>{hours > 0 ? `${hours} hour(s)` : "—"}</span>
+                <span>
+                  {durationMinutes > 0
+                    ? `${hours} hour(s)`
+                    : "—"}
+                </span>
               </div>
+
               <div className="mt-3 flex justify-between font-bold">
                 <span>Total Price</span>
+
                 <span className="text-violet-600">
                   ৳{totalPrice.toLocaleString()}
                 </span>

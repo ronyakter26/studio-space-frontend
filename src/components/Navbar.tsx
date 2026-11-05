@@ -225,7 +225,7 @@ export default function Navbar() {
                 </Link>
 
                 <Link
-                  href="/sign-up"
+                  href="/register"
                   className="rounded-full bg-violet-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-violet-700"
                 >
                   Register
@@ -345,7 +345,7 @@ export default function Navbar() {
                     </Link>
 
                     <Link
-                      href="/sign-up"
+                      href="/register"
                       onClick={() => setMobileMenu(false)}
                       className="flex-1 rounded-full bg-violet-600 py-2.5 text-center font-semibold text-white"
                     >

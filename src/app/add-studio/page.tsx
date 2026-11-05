@@ -4,13 +4,13 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { PlusCircle } from "lucide-react";
+import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 
 export default function AddStudioPage() {
   const router = useRouter();
 
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
 
   const [formData, setFormData] = useState({
     name: "",
@@ -35,15 +35,15 @@ export default function AddStudioPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    setMessage("");
 
     try {
-      // Get JWT Token from Better Auth
       const { data: tokenData, error: tokenError } =
         await authClient.token();
 
       if (tokenError || !tokenData?.token) {
-        throw new Error("Unable to get authentication token. Please login again.");
+        throw new Error(
+          "Unable to get authentication token. Please login again."
+        );
       }
 
       const apiUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -63,7 +63,7 @@ export default function AddStudioPage() {
         throw new Error(result.message || "Failed to add studio");
       }
 
-      setMessage("Studio added successfully!");
+      toast.success("Studio added successfully!");
 
       setFormData({
         name: "",
@@ -78,7 +78,7 @@ export default function AddStudioPage() {
         router.push("/explore");
       }, 1200);
     } catch (error) {
-      setMessage(
+      toast.error(
         error instanceof Error
           ? error.message
           : "Something went wrong!"
@@ -203,12 +203,6 @@ export default function AddStudioPage() {
               className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-violet-600 dark:border-gray-700 dark:bg-gray-800"
             />
           </div>
-
-          {message && (
-            <p className="rounded-lg bg-violet-50 p-3 text-sm text-violet-700 dark:bg-violet-950 dark:text-violet-300">
-              {message}
-            </p>
-          )}
 
           <button
             type="submit"

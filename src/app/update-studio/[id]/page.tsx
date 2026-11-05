@@ -1,10 +1,11 @@
+
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Pencil } from "lucide-react";
+import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
-
 
 interface Studio {
   _id: string;
@@ -17,13 +18,12 @@ interface Studio {
 }
 
 function UpdateStudioContent() {
-      const router = useRouter();
+  const router = useRouter();
   const params = useParams();
   const studioId = params.id as string;
 
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
-  const [message, setMessage] = useState("");
 
   const [formData, setFormData] = useState({
     name: "",
@@ -76,7 +76,7 @@ function UpdateStudioContent() {
           image: studio.image,
         });
       } catch (error) {
-        setMessage(
+        toast.error(
           error instanceof Error ? error.message : "Something went wrong!"
         );
       } finally {
@@ -102,7 +102,6 @@ function UpdateStudioContent() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setUpdating(true);
-    setMessage("");
 
     try {
       const { data: tokenData, error: tokenError } =
@@ -132,13 +131,13 @@ function UpdateStudioContent() {
         throw new Error(result.message || "Failed to update studio.");
       }
 
-      setMessage("Studio updated successfully!");
+      toast.success("Studio updated successfully!");
 
       setTimeout(() => {
         router.push("/my-listings");
       }, 1200);
     } catch (error) {
-      setMessage(
+      toast.error(
         error instanceof Error ? error.message : "Something went wrong!"
       );
     } finally {
@@ -272,12 +271,6 @@ function UpdateStudioContent() {
             />
           </div>
 
-          {message && (
-            <p className="rounded-lg bg-violet-50 p-3 text-sm text-violet-700 dark:bg-violet-950 dark:text-violet-300">
-              {message}
-            </p>
-          )}
-
           <button
             type="submit"
             disabled={updating}
@@ -290,6 +283,7 @@ function UpdateStudioContent() {
     </main>
   );
 }
+
 export default function UpdateStudioPage() {
   return (
     <Suspense

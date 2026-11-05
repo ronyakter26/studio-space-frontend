@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Josefin_Sans } from "next/font/google";
 import { Suspense } from "react";
 import "./globals.css";
+import { Toaster } from "sonner";
 
 import Providers from "@/components/Providers";
 import Navbar from "@/components/Navbar";
@@ -36,6 +37,7 @@ export default function RootLayout({
                   <Footer />
 
         </Providers>
+        <Toaster position="top-right" richColors closeButton />
       </body>
     </html>
   );

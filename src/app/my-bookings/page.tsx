@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { authClient } from "@/lib/auth-client";
+import { toast } from "sonner";
 import {
   CalendarDays,
   Clock,
@@ -32,12 +33,12 @@ export default function MyBookingsPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const [selectedBooking, setSelectedBooking] =
     useState<Booking | null>(null);
   const [cancelling, setCancelling] = useState(false);
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  const apiUrl =
+    process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
   // Fetch My Bookings
   useEffect(() => {
@@ -68,16 +69,20 @@ export default function MyBookingsPage() {
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.message || "Failed to load bookings.");
+          throw new Error(
+            data.message || "Failed to load bookings."
+          );
         }
 
         setBookings(data);
       } catch (err) {
-        setError(
+        const message =
           err instanceof Error
             ? err.message
-            : "Something went wrong."
-        );
+            : "Something went wrong.";
+
+        setError(message);
+        toast.error(message);
       } finally {
         setLoading(false);
       }
@@ -93,7 +98,6 @@ export default function MyBookingsPage() {
     try {
       setCancelling(true);
       setError("");
-      setSuccess("");
 
       const { data: tokenData } = await authClient.token();
 
@@ -114,7 +118,9 @@ export default function MyBookingsPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Failed to cancel booking.");
+        throw new Error(
+          data.message || "Failed to cancel booking."
+        );
       }
 
       setBookings((previous) =>
@@ -126,13 +132,16 @@ export default function MyBookingsPage() {
       );
 
       setSelectedBooking(null);
-      setSuccess("Booking cancelled successfully!");
+
+      toast.success("Booking cancelled successfully!");
     } catch (err) {
-      setError(
+      const message =
         err instanceof Error
           ? err.message
-          : "Something went wrong."
-      );
+          : "Something went wrong.";
+
+      setError(message);
+      toast.error(message);
     } finally {
       setCancelling(false);
     }
@@ -152,9 +161,11 @@ export default function MyBookingsPage() {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center gap-4 bg-gray-50 px-4 dark:bg-gray-950">
         <h1 className="text-2xl font-bold">Please Login</h1>
+
         <p className="text-gray-500">
           Login to see your bookings.
         </p>
+
         <Link
           href="/login"
           className="rounded-lg bg-violet-600 px-6 py-3 font-semibold text-white"
@@ -172,6 +183,7 @@ export default function MyBookingsPage() {
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
             My Bookings
           </h1>
+
           <p className="mt-2 text-gray-600 dark:text-gray-400">
             Manage and view all your studio bookings.
           </p>
@@ -183,24 +195,21 @@ export default function MyBookingsPage() {
           </div>
         )}
 
-        {success && (
-          <div className="mb-6 rounded-lg bg-green-50 p-4 text-green-700 dark:bg-green-950/30 dark:text-green-400">
-            {success}
-          </div>
-        )}
-
         {!error && bookings.length === 0 ? (
           <div className="rounded-2xl bg-white px-6 py-16 text-center shadow-sm dark:bg-gray-900">
             <CalendarDays
               size={48}
               className="mx-auto mb-4 text-violet-500"
             />
+
             <h2 className="text-xl font-bold text-gray-900 dark:text-white">
               No Bookings Yet
             </h2>
+
             <p className="mt-2 text-gray-500">
               You have not booked any studio yet.
             </p>
+
             <Link
               href="/explore"
               className="mt-6 inline-block rounded-lg bg-violet-600 px-6 py-3 font-semibold text-white hover:bg-violet-700"
@@ -208,7 +217,7 @@ export default function MyBookingsPage() {
               Explore Studios
             </Link>
           </div>
-        ) : (
+        ) : !error ? (
           <div className="grid gap-6 md:grid-cols-2">
             {bookings.map((booking) => (
               <div
@@ -271,6 +280,7 @@ export default function MyBookingsPage() {
                   <div className="mt-5 border-t border-gray-200 pt-4 dark:border-gray-700">
                     <div className="flex justify-between font-bold">
                       <span>Total Price</span>
+
                       <span className="text-violet-600">
                         ৳{booking.totalPrice?.toLocaleString()}
                       </span>
@@ -289,7 +299,7 @@ export default function MyBookingsPage() {
               </div>
             ))}
           </div>
-        )}
+        ) : null}
       </div>
 
       {/* Cancel Confirmation Modal */}

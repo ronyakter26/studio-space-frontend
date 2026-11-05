@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
+import { toast } from "sonner";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -15,7 +16,6 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
-  const [error, setError] = useState("");
 
   const getRedirectPath = () => {
     const params = new URLSearchParams(window.location.search);
@@ -43,7 +43,6 @@ export default function LoginPage() {
   ) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
 
     try {
       const { error } = await authClient.signIn.email({
@@ -52,14 +51,15 @@ export default function LoginPage() {
       });
 
       if (error) {
-        setError(error.message || "Login failed.");
+        toast.error(error.message || "Login failed.");
         return;
       }
 
+      toast.success("Login successful!");
       router.replace(getRedirectPath());
       router.refresh();
     } catch {
-      setError("Something went wrong. Please try again.");
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -67,7 +67,6 @@ export default function LoginPage() {
 
   const handleGoogleLogin = async () => {
     setGoogleLoading(true);
-    setError("");
 
     try {
       const { error } = await authClient.signIn.social({
@@ -76,11 +75,11 @@ export default function LoginPage() {
       });
 
       if (error) {
-        setError(error.message || "Google login failed.");
+        toast.error(error.message || "Google login failed.");
         setGoogleLoading(false);
       }
     } catch {
-      setError("Google login failed. Please try again.");
+      toast.error("Google login failed. Please try again.");
       setGoogleLoading(false);
     }
   };
@@ -109,6 +108,7 @@ export default function LoginPage() {
           </p>
         </div>
 
+        {/* Google Login */}
         <button
           type="button"
           onClick={handleGoogleLogin}
@@ -156,12 +156,6 @@ export default function LoginPage() {
               className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-violet-600 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
             />
           </div>
-
-          {error && (
-            <p className="rounded-lg bg-red-50 p-3 text-sm text-red-600 dark:bg-red-950 dark:text-red-300">
-              {error}
-            </p>
-          )}
 
           <button
             type="submit"
